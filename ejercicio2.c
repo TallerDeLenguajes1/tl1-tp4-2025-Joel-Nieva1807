@@ -37,6 +37,14 @@ void InsertarNodo(nodo **Start, nodo *Nodo){
     *Start = Nodo;
 }
 
+void eliminarNodo(nodo **Start){
+    nodo *Nnodo = *Start;
+
+    free(Nnodo->T.Descripcion);
+    free(Nnodo);
+    
+}
+
 void quitarNodo(nodo **Start, int idBuscado){
     nodo *nodoActual = *Start;
     nodo *nodoAnterior = NULL;
@@ -68,8 +76,9 @@ void quitarNodo(nodo **Start, int idBuscado){
             nodoAnterior->Siguiente = nodoActual->Siguiente;
             
         }
-        free(nodoActual->T.Descripcion);
-        free(nodoActual);
+        /* free(nodoActual->T.Descripcion);
+        free(nodoActual); */
+        eliminarNodo(&nodoActual);
         
         
     }
@@ -91,6 +100,7 @@ nodo *buscarNodo(nodo *Start, int idBuscado){
 void cargarTareasPendientes(nodo **listaPendiente);
 void transferirTareas(nodo **listaPendiente, nodo **listaRealizada);
 void imprimirLista(nodo *start);
+void mostrarTodasLasTareas(nodo **listaPendiente, nodo **ListaRealizada);
 
 int main()
 {
@@ -105,7 +115,7 @@ int main()
     {
         puts("-----Modulo To-Do-----");
         puts("'1' Para cargar tareas pendientes.");
-        puts("'2' Para transferir tareas pendientes a tareas realizdas:");
+        puts("'2' Para transferir tareas pendientes a tareas realizadas:");
         puts("'3' Para imprimir las tareas pendientes y las tareas realizadas:");
         
         
@@ -123,6 +133,11 @@ int main()
             transferirTareas(&tareaPendiente, &tareaRealizada);
             
             break;
+
+        case 3:
+            mostrarTodasLasTareas(&tareaPendiente, &tareaRealizada);
+            
+            break;
     
         
         
@@ -132,9 +147,6 @@ int main()
         
     } while (opcion !=0);
 
-   
-
-    //imprimirLista(tareaPendiente);
  
     return 0;
 }
@@ -154,9 +166,18 @@ void cargarTareasPendientes(nodo **listaPendiente){
         gets(arreglo);
         int tamCadena = strlen(arreglo) + 1;;
 
-        puts("Ingrese la duracion de la tarea (entre 10 y 100 horas):");
-        scanf("%d", &duracion);
+            do
+            {
+                puts("Ingrese la duracion de la tarea (entre 10 y 100) horas:");
+                scanf("%d", &duracion);
 
+                if (duracion<10 || duracion >100)
+                {
+                    puts("Invalido. Recuerde que debe ingresar un numero entre 10 hasta 100.");
+                }
+                
+            } while (duracion<10 || duracion >100);
+    
         nodo *nuevo = crearNodo(arreglo, tamCadena, duracion );
         nuevo->T.TareaID= ID +i;
         i++;
@@ -183,7 +204,7 @@ void transferirTareas(nodo **listaPendiente, nodo **listaRealizada){
     imprimirLista(*listaPendiente);
     do
     {
-        puts("Ingrese el ID de la tarea que quiere que se añada a las tareas realizadas. Si desea salir de este menu solo presione (0):");
+        puts("Ingrese el ID de la tarea que quiere que se añada a las tareas realizadas. Si desea salir o terminar el proceso solo presione (0):");
         scanf("%d", &numero);
         fflush(stdin);
         cambio=buscarNodo(*listaPendiente, numero);
@@ -201,7 +222,17 @@ void transferirTareas(nodo **listaPendiente, nodo **listaRealizada){
         
     } while (numero!=0);
 
-    imprimirLista(*listaRealizada);
+
+    
+}
+
+void mostrarTodasLasTareas(nodo **listaPendiente, nodo **ListaRealizada){
+    puts("");
+    puts("Las tareas pendientes son:");
+    imprimirLista(*listaPendiente);
+    puts("");
+    puts("Las tareas realizadas son:");
+    imprimirLista(*ListaRealizada);
     
 }
 
