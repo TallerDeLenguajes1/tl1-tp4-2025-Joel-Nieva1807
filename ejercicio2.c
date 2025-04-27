@@ -37,6 +37,47 @@ void InsertarNodo(nodo **Start, nodo *Nodo){
     *Start = Nodo;
 }
 
+void quitarNodo(nodo **Start, int idBuscado){
+    nodo *nodoActual = *Start;
+    nodo *nodoAnterior = NULL;
+
+    while (nodoActual != NULL && nodoActual->T.TareaID != idBuscado)
+    {
+        nodoAnterior = nodoActual;
+        nodoActual = nodoActual->Siguiente;
+    }
+
+    if (nodoActual ==NULL) //significa que no se encontro el nodo con ese dato (o que la lista esta vacia)
+    {
+        if (*Start == NULL)
+        {
+            puts("La lista vacia");
+        }else
+        {
+            puts("No se encontro el elemento en la lista");
+        }
+        
+        
+    }else
+    {
+        if (*Start == nodoActual) //es para borrar el primer elemento
+        {
+            *Start = nodoActual->Siguiente; //la cabecera apunta al segundo elemento (en este caso)
+        }else
+        {
+            nodoAnterior->Siguiente = nodoActual->Siguiente;
+            
+        }
+        free(nodoActual->T.Descripcion);
+        free(nodoActual);
+        
+        
+    }
+    
+    
+    
+}
+
 nodo *buscarNodo(nodo *Start, int idBuscado){
     nodo *Aux = Start;
     while (Aux && Aux->T.TareaID != idBuscado)
@@ -47,8 +88,8 @@ nodo *buscarNodo(nodo *Start, int idBuscado){
     
 }
 
-void cargarTareasPendientes();
-void transferirTareas();
+void cargarTareasPendientes(nodo **listaPendiente);
+void transferirTareas(nodo **listaPendiente, nodo **listaRealizada);
 void imprimirLista(nodo *start);
 
 int main()
@@ -65,32 +106,35 @@ int main()
         puts("-----Modulo To-Do-----");
         puts("'1' Para cargar tareas pendientes.");
         puts("'2' Para transferir tareas pendientes a tareas realizdas:");
+        puts("'3' Para imprimir las tareas pendientes y las tareas realizadas:");
         
         
     
         scanf("%d", &opcion);
-        
-    } while (opcion < 1 || opcion > 4);
 
-    switch (opcion)
-    {
-    case 1:
-        cargarTareasPendientes(&tareaPendiente);
-        
-        break;
-
-    case 2:
-        ;
-        
-        break;
-
+        switch (opcion)
+        {
+        case 1:
+            cargarTareasPendientes(&tareaPendiente);
+            
+            break;
     
+        case 2:
+            transferirTareas(&tareaPendiente, &tareaRealizada);
+            
+            break;
     
-    default:
-        break;
-    }
+        
+        
+        default:
+            break;
+        }
+        
+    } while (opcion !=0);
 
-    imprimirLista(tareaPendiente);
+   
+
+    //imprimirLista(tareaPendiente);
  
     return 0;
 }
@@ -132,24 +176,43 @@ void cargarTareasPendientes(nodo **listaPendiente){
     
 }
 
-void transferirTareas(){
-    
-    puts("A continuacion se mostraran los ID de las tareas:");
+void transferirTareas(nodo **listaPendiente, nodo **listaRealizada){
+    int numero;
+    nodo *cambio;
+    puts("A continuacion se mostraran los ID con sus respectivas tareas:");
+    imprimirLista(*listaPendiente);
+    do
+    {
+        puts("Ingrese el ID de la tarea que quiere que se añada a las tareas realizadas. Si desea salir de este menu solo presione (0):");
+        scanf("%d", &numero);
+        fflush(stdin);
+        cambio=buscarNodo(*listaPendiente, numero);
+        if (cambio!=NULL)
+        {
+            // Crear un nuevo nodo con los mismos datos
+            nodo *nuevo = crearNodo(cambio->T.Descripcion, strlen(cambio->T.Descripcion) + 1, cambio->T.Duracion);
+            nuevo->T.TareaID = cambio->T.TareaID;
 
+            InsertarNodo(listaRealizada, nuevo);
+            quitarNodo(listaPendiente, numero);
+        }
+        
+        
+        
+    } while (numero!=0);
+
+    imprimirLista(*listaRealizada);
+    
 }
 
 void imprimirLista(nodo *start){
     nodo *actual;
-
-    puts("La lista es:");
-
     for ( actual=start;actual!=NULL ;actual=actual->Siguiente )
     {
-        printf("%s\n", actual->T.Descripcion);
-        printf("%d\n", actual->T.Duracion);
-        printf("%d\n", actual->T.TareaID);
+        printf("El ID de esta tarea es: %d.\n", actual->T.TareaID);
+        printf("Su descripcion es: %s.\n", actual->T.Descripcion);
+        printf("La duracion de la tarea es: %d\n", actual->T.Duracion);
         puts("-----------------");
     }
-    
 }
     
