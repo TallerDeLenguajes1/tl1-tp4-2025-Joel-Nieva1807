@@ -97,7 +97,7 @@ nodo *buscarNodo(nodo *Start, int idBuscado){
     
 }
 
-void cargarTareasPendientes(nodo **listaPendiente);
+void cargarTareasPendientes(nodo **listaPendiente, int *puntero);
 void transferirTareas(nodo **listaPendiente, nodo **listaRealizada);
 void imprimirLista(nodo *start);
 void mostrarTodasLasTareas(nodo **listaPendiente, nodo **ListaRealizada);
@@ -113,7 +113,8 @@ int main()
     tareaPendiente= crearListaVacia();
     tareaRealizada= crearListaVacia();
 
-    int opcion;
+    int opcion, contador=0, *puntero;
+    puntero= &contador;
 
     do
     {
@@ -129,7 +130,7 @@ int main()
         switch (opcion)
         {
         case 1:
-            cargarTareasPendientes(&tareaPendiente);
+            cargarTareasPendientes(&tareaPendiente, puntero);
             
             break;
     
@@ -162,9 +163,9 @@ int main()
     return 0;
 }
 
-void cargarTareasPendientes(nodo **listaPendiente){
+void cargarTareasPendientes(nodo **listaPendiente, int *puntero){
     char respuesta;
-    int i=0, duracion;
+    int duracion;
     
     
     do
@@ -190,8 +191,8 @@ void cargarTareasPendientes(nodo **listaPendiente){
             } while (duracion<10 || duracion >100);
     
         nodo *nuevo = crearNodo(arreglo, tamCadena, duracion );
-        nuevo->T.TareaID= ID +i;
-        i++;
+        nuevo->T.TareaID= ID + (*puntero);
+        (*puntero)++;
 
 
         InsertarNodo(listaPendiente, nuevo);
