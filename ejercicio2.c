@@ -101,6 +101,10 @@ void cargarTareasPendientes(nodo **listaPendiente);
 void transferirTareas(nodo **listaPendiente, nodo **listaRealizada);
 void imprimirLista(nodo *start);
 void mostrarTodasLasTareas(nodo **listaPendiente, nodo **ListaRealizada);
+void consultarTarea(nodo **listaPendiente, nodo **ListaRealizada);
+void mostrarPorID(nodo **lista);
+void mostrarPorPalabra(nodo *Start, char arreglo[]);
+void liberarMemoria(nodo **listaPendiente, nodo **ListaRealizada);
 
 int main()
 {
@@ -117,9 +121,9 @@ int main()
         puts("'1' Para cargar tareas pendientes.");
         puts("'2' Para transferir tareas pendientes a tareas realizadas:");
         puts("'3' Para imprimir las tareas pendientes y las tareas realizadas:");
+        puts("'4' Para buscar una tarea (pendiente o realizada), ya sea por ID o por palabra clave:");
+        puts("'0' Para salir del menu:");
         
-        
-    
         scanf("%d", &opcion);
 
         switch (opcion)
@@ -138,14 +142,21 @@ int main()
             mostrarTodasLasTareas(&tareaPendiente, &tareaRealizada);
             
             break;
-    
-        
+
+        case 4:
+            consultarTarea(&tareaPendiente, &tareaRealizada)
+            ;
+            
+            break;
         
         default:
+            puts("Ingrese un valor valido (desde 0 hasta 4).");
             break;
         }
         
     } while (opcion !=0);
+
+    liberarMemoria(&tareaPendiente, &tareaRealizada);
 
  
     return 0;
@@ -245,5 +256,156 @@ void imprimirLista(nodo *start){
         printf("La duracion de la tarea es: %d\n", actual->T.Duracion);
         puts("-----------------");
     }
+}
+
+void consultarTarea(nodo **listaPendiente, nodo **ListaRealizada){
+    int opcion;
+    char palabra[25];
+    puts("Indique si quiere buscar en tareas realizadas(1) o tareas pendientes (2)");
+    scanf("%d", &opcion);
+    fflush(stdin);
+
+    if (opcion == 1)
+    {
+        puts("Indique si quiere hacer una busqueda por ID (3) o por palabra (4)");
+        scanf("%d", &opcion);
+        fflush(stdin);
+        
+
+        if (opcion==3)
+        {
+            
+            mostrarPorID(ListaRealizada);
+            puts("Lo mostrado corresponde a una tarea realizada:");
+            
+            
+        }else if (opcion==4)
+        {
+            puts("Ingrese la palabra para buscar una tarea:");
+            gets(palabra);
+            mostrarPorPalabra(*ListaRealizada, palabra);
+            puts("Lo mostrado corresponde a una tarea realizada:");
+
+        }else
+        {
+            puts("Error. La proxima ingrese 3 o 4.");
+            
+        }
+        
+        
+        
+        
+        
+    }else if (opcion == 2)
+    {
+        puts("Indique si quiere hacer una busqueda por ID (3) o por palabra (4)");
+        scanf("%d", &opcion);
+        fflush(stdin);
+
+        if (opcion==3)
+        {
+            mostrarPorID(listaPendiente);
+            puts("Lo mostrado corresponde a una tarea pendiente:");
+            
+        }else if (opcion==4)
+        {
+            puts("Ingrese la palabra para buscar una tarea:");
+            gets(palabra);
+            mostrarPorPalabra(*listaPendiente, palabra);
+            puts("Lo mostrado corresponde a una tarea pendiente:");
+
+        }else
+        {
+            puts("Error. La proxima ingrese 3 o 4.");
+            
+        }
+    }else
+    {
+        puts("Error. La proxima ingrese 1 o 2.");
+    }
+
+    fflush(stdin);
+    
+    
+    
+}
+
+void mostrarPorID(nodo **lista){
+    int numero;
+    nodo *mostar;
+
+    do
+    {
+        puts("Ingrese el ID de la tarea que quiere buscar. Si desea salir o terminar el proceso solo presione (0):");
+        scanf("%d", &numero);
+        fflush(stdin);
+        mostar=buscarNodo(*lista, numero);
+        if (mostar!=NULL)
+        {
+
+
+            printf("El ID de esta tarea es: %d.\n", mostar->T.TareaID);
+            printf("Su descripcion es: %s.\n", mostar->T.Descripcion);
+            printf("La duracion de la tarea es: %d\n", mostar->T.Duracion);
+            puts("-----------------");
+           
+
+            
+        }else
+        {
+            puts("No se encontró una tarea con ese ID.");
+            
+        }
+        
+        
+        
+        
+    } while (numero!=0);
+}
+
+void mostrarPorPalabra(nodo *Start, char arreglo[]){
+    nodo *Aux = Start;
+    while (Aux && strstr(Aux->T.Descripcion, arreglo) == NULL)
+    {
+        Aux = Aux ->Siguiente;
+    }
+    
+    if (Aux!=NULL)
+    {
+        printf("El ID de esta tarea es: %d.\n", Aux->T.TareaID);
+        printf("Su descripcion es: %s.\n",Aux->T.Descripcion );
+        printf("La duracion de la tarea es: %d\n", Aux->T.Duracion);
+        puts("-----------------");
+        
+    }else
+    {
+        puts("No se encontró una tarea con esa palabra.");
+        
+    }
+    
+
+}
+
+void liberarMemoria(nodo **listaPendiente, nodo **ListaRealizada){
+    nodo *Aux = *listaPendiente;
+    nodo *Aux2 = *ListaRealizada;
+    nodo *siguiente = NULL;
+    while (Aux!=NULL)
+    {
+        siguiente= Aux->Siguiente;
+        free(Aux->T.Descripcion);
+        free(Aux);
+        Aux= siguiente;
+    }
+    while (Aux2!=NULL)
+    {
+        siguiente= Aux2->Siguiente;
+        free(Aux2->T.Descripcion);
+        free(Aux2);
+        Aux2= siguiente;
+    }
+
+    
+    
 }
     
